@@ -21,20 +21,22 @@ const Game = () => {
   const [isFirstPlayer, setIsFirstPlayer] = useState(true);
   const [winningPlayer, setWinningPlayer] = useState("");
 
-  const handleOnClick = (element) => {
+  const handleOnClick = (i, j) => {
+    // dekonstruisemo XO niz preko takozvanog spred operatora (...nekiNizIliObjekat) i onda te clanove
+    // niza smestamo u niz [] i cuvamo ih u xoCopy variablu
     let xoCopy = [...XO];
     // let xoCopy = [      <--- isto ko linija iznad
     //               ["X", null, "O"],
     //               [null, "X", null],
     //               [null, "X", null]]
 
-    // if (xoCopy[element.id[0]][element.id[1]] === null)
     if (winningPlayer === "") {
-      if (!xoCopy[element.id[0]][element.id[1]]) {
+      // if (xoCopy[element.id[0]][element.id[1]] === null) <-- ekvivalentno liniji ispod
+      if (!xoCopy[i][j]) {
         if (isFirstPlayer) {
-          xoCopy[element.id[0]][element.id[1]] = "X";
+          xoCopy[i][j] = "X";
         } else {
-          xoCopy[element.id[0]][element.id[1]] = "O";
+          xoCopy[i][j] = "O";
         }
 
         setXO(xoCopy);
@@ -53,16 +55,21 @@ const Game = () => {
     let winningPlayer = null;
 
     winningCombinations.forEach((wc) => {
-      let combination = [];
+      let lineCombination = [];
       wc.forEach((sqr) => {
-        combination.push(XO[sqr[0]][sqr[1]]);
+        lineCombination.push(XO[sqr[0]][sqr[1]]);
       });
 
+      // Proveravamo da li je prvi clan potencialno pobednicke kombinacije razlicit od null
+      // Zatim proveravamo da li je jednak clanu pored njega ("X" === "X")
+      // Onda proveravamo da li je takodje jednak poslednjem (trecem) clanu u kombinaciji
+      // Ako jeste onda imammo pobednika
       if (
-        combination[0] === combination[1] &&
-        combination[0] === combination[2]
+        lineCombination[0] !== null &&
+        lineCombination[0] === lineCombination[1] &&
+        lineCombination[0] === lineCombination[2]
       ) {
-        winningPlayer = combination[0];
+        winningPlayer = lineCombination[0];
       }
     });
     return winningPlayer;
@@ -79,7 +86,7 @@ const Game = () => {
                 <div
                   key={square + j.toString()}
                   id={i.toString() + j.toString()}
-                  onClick={(el) => handleOnClick(el.target)}
+                  onClick={() => handleOnClick(i, j)}
                   className="square"
                 >
                   {square}
